@@ -12,7 +12,16 @@ import discord
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess)
 
-activeChannels = []
+activeChannels = {}
+
+def checkActiveChannel(id):
+    if id in activeChannels:
+        return True
+    activeChannels[id] = True
+    return False
+
+def removeActiveChannel(id):
+    del activeChannels[id]
 
 client = discord.Client()
 class Conversation:
@@ -31,8 +40,10 @@ class Conversation:
         return output
 
     def buildResponse(self):
-        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=10, return_as_list=True)
-        return rawresponse[0].split('\n', 1)[0]
+        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=20, return_as_list=True)
+        print(rawresponse)
+        chats = rawresponse[0].split('\n')
+        return chats[1] + " " + chats[2] 
 
 @client.event
 async def on_ready():
@@ -50,14 +61,18 @@ async def on_message(message):
     mentions = message.mentions
     for usr in mentions:
         if usr.id == client.user.id: # if bot was mentioned
+            # we're already typing in that channel
+            if (checkActiveChannel(message.channel.id)):
+                print("busy!")
+                return
             # start "typing" to let the users know we're running the model
             print("crafting response...")
             async with message.channel.typing():
                 # build conversation, then use gpt-2 on convo to extract response
                 convo = Conversation()
-                async for msg in message.channel.history(limit=15):
-                    convo.add(msg.clean_content)
+                convo.add(message.clean_content.replace("@ConvoBot", ""))
                 predictedResponse = convo.buildResponse()
+                removeActiveChannel(message.channel.id)
                 await message.channel.send(predictedResponse)
         break
 
