@@ -65,5 +65,6 @@ async def on_ready():
                 newfile.write(line)
 
     newfile.close()
+    print("done!")
 
 client.run(open("client-token", "r").readline())
