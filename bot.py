@@ -9,10 +9,8 @@ import gpt_2_simple as gpt2
 import discord
 
 # loads our trained model
-sess = None
-if not logMode:
-    sess = gpt2.start_tf_sess()
-    gpt2.load_gpt2(sess)
+sess = gpt2.start_tf_sess()
+gpt2.load_gpt2(sess)
 
 activeChannels = []
 
