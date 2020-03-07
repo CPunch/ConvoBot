@@ -1,6 +1,7 @@
 # this file will grab chat logs from all of the channels it's connected too. easy way to grab training data to use
 
 import os
+import sys
 import discord
 
 chat_dir = "chats"
@@ -14,7 +15,7 @@ whitelist = [646807091012435981, 502296284556951563]
 def passFilter(msg):
     return len(msg) > 0
 
-def scrapeChannel(channel):
+async def scrapeChannel(channel):
     try:
         with open(os.path.join(chat_dir, channel.name + str(channel.id)), "a") as cLog:
             rawData = []
@@ -26,7 +27,7 @@ def scrapeChannel(channel):
 
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
-                cLog.write(msg)
+                cLog.write(str(msg.encode('utf-8')))
     except:
         print("failed!")
 
@@ -41,7 +42,7 @@ async def on_ready():
             server = channel.guild
 
             print("Scraping " + server.name + " : " + channel.name)
-            scrapeChannel(channel)
+            await scrapeChannel(channel)
     else:
         # for every server, go to every channel
         for server in client.guilds:
@@ -53,7 +54,7 @@ async def on_ready():
                     channel.type == discord.ChannelType.group and 
                     not channel.is_nsfw()): # now do some sanity checks
                     # scrape the chat history into a file 
-                    scrapeChannel(channel)
+                    await scrapeChannel(channel)
     
     # after scraping, combine all data into one file for training
     newfile = open(main_dataset, "a")
