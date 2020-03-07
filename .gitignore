@@ -3,3 +3,4 @@ client-token
 checkpoint
 models
 complete-data
+*.swp

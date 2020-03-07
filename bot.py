@@ -70,7 +70,8 @@ async def on_message(message):
             async with message.channel.typing():
                 # build conversation, then use gpt-2 on convo to extract response
                 convo = Conversation()
-                convo.add(message.clean_content.replace("@ConvoBot", ""))
+                async for msg in channel.history(limit=4):
+                    convo.add(msg.clean_content.replace("@ConvoBot", ""))
                 predictedResponse = convo.buildResponse()
                 removeActiveChannel(message.channel.id)
                 await message.channel.send(predictedResponse)
