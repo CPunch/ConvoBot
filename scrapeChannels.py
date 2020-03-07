@@ -10,14 +10,20 @@ main_dataset = "complete-data"
 client = discord.Client()
 
 use_whitelist = True
-whitelist = [646807091012435981, 502296284556951563]
+whitelist = [646807091012435981, 502289648551329793, 502296284556951563]
 
 def passFilter(msg):
     return len(msg) > 0
 
 async def scrapeChannel(channel):
+
+    # if we already have a log for that channel, remove it!
+    file_path = os.path.join(chat_dir, channel.name + str(channel.id))
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
     try:
-        with open(os.path.join(chat_dir, channel.name + str(channel.id)), "a") as cLog:
+        with open(file_path, "a") as cLog:
             rawData = []
 
             # add channel histroy to raw data
@@ -66,5 +72,7 @@ async def on_ready():
 
     newfile.close()
     print("done!")
+
+    await client.close()
 
 client.run(open("client-token", "r").readline())
