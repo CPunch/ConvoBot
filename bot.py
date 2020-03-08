@@ -15,6 +15,7 @@ sess = gpt2.start_tf_sess(threads=2)
 gpt2.load_gpt2(sess)
 
 responses=0
+sessCritical=False
 
 # just some stuff to add to the magic
 bot_name = "@ConvoBot"
@@ -60,12 +61,15 @@ class Conversation:
     def buildResponse(self):
         global responses
         global sess
+        global sessCritical
         responses=responses+1
         rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
 
         # clean memory every 10 responses. things can get fat really quickly if you don't :eyes:
         if responses % 10:
+            sessCritical = True
             sess = gpt2.reset_session(sess, threads=2)
+            sessCritical = False
         print(rawresponse)
         chats = rawresponse[0].split('\n')
         return self.getUnique(chats)
@@ -80,8 +84,8 @@ async def on_message(message):
     if len(message.clean_content) <= 0 or "http" in message.clean_content:
         return
 
-    # don't do anything if we sent the message, and ignore it if it's from a blacklisted user
-    if message.author == client.user or message.author.id in blacklistedUsers:
+    # don't do anything if we sent the message, and ignore it if it's from a blacklisted user, or if we're currently clearing tensorflow memory
+    if message.author == client.user or message.author.id in blacklistedUsers or sessCritical:
         return
 
     mentions = message.mentions
