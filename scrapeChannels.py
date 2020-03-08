@@ -4,6 +4,8 @@ import os
 import sys
 import discord
 
+import blacklist as bl
+
 chat_dir = "chats"
 main_dataset = "complete-data"
 
@@ -11,10 +13,6 @@ client = discord.Client()
 
 use_whitelist = True
 whitelist = [646807091012435981, 502289648551329793, 502296284556951563]
-
-def passFilter(msg):
-    # lets make sure it isn't an empty message or a shitpost
-    return len(msg) > 0 and not 'http' in msg
 
 def deleteIfExist(file_path):
     if os.path.isfile(file_path):
@@ -30,15 +28,22 @@ async def scrapeChannel(channel):
             rawData = []
 
             # add channel histroy to raw data
+            lastMessage = None
             async for message in channel.history(limit=10000): # should i limit more?? hmm
                 msg = message.clean_content.encode('ascii', 'ignore').decode('ascii')
-                if passFilter(message.clean_content): 
-                    rawData.append(message.clean_content)
+                if bl.passFilter(msg): 
+
+                    # combine messages from people onto the same line
+                    if lastMessage != None and lastMessage.author.id == message.author.id:
+                        rawData[-1] = rawData[-1] + " " + msg
+                    else:
+                        rawData.append(msg)
+                    lastMessage = message
 
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
                 cLog.write(msg + '\n')
-    except:
+    except e:
         print("failed!")
 
 @client.event

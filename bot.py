@@ -8,6 +8,8 @@ import os
 import gpt_2_simple as gpt2
 import discord
 
+import blacklist as bl
+
 # loads our trained model
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess)
@@ -32,6 +34,9 @@ class Conversation:
 
     def add(self, text):
         self.conversation.append(text.replace("\n", ""))
+
+    def continued(self, text):
+        self.conversation[-1] = self.conversation[-1] + " " + text
 
     def grabText(self):
         output = ""
@@ -70,8 +75,18 @@ async def on_message(message):
             async with message.channel.typing():
                 # build conversation, then use gpt-2 on convo to extract response
                 convo = Conversation()
-                async for msg in channel.history(limit=4):
-                    convo.add(msg.clean_content.replace("@ConvoBot", ""))
+                lastMessage = None
+                async for messg in channel.history(limit=10):
+                    msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii')
+                    if bl.passFilter(msg): 
+
+                        # combine messages from people onto the same line
+                        if lastMessage != None and lastMessage.author.id == messg.author.id:
+                            convo.continued(msg)
+                        else:
+                            convo.add(msg)
+                        lastMessage = messg
+
                 predictedResponse = convo.buildResponse()
                 removeActiveChannel(message.channel.id)
                 await message.channel.send(predictedResponse)
