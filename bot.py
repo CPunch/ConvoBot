@@ -11,7 +11,7 @@ import discord
 import blacklist as bl
 
 # loads our trained model
-sess = gpt2.start_tf_sess(threads=2)
+sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess)
 
 responses=0
@@ -69,7 +69,7 @@ class Conversation:
         if responses % 10 == 0:
             sessCritical = True
             print("=========FREEING MEMORY=========")
-            sess = gpt2.reset_session(sess, threads=2)
+            sess = gpt2.reset_session(sess)
             sessCritical = False
         print(rawresponse)
         chats = rawresponse[0].split('\n')
