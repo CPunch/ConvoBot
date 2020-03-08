@@ -58,6 +58,7 @@ class Conversation:
         return results[-2]
 
     def buildResponse(self):
+        global responses
         responses=responses+1
         rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
 
