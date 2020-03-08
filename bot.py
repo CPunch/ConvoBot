@@ -56,14 +56,15 @@ class Conversation:
         return results[-2]
 
     def buildResponse(self):
-        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
+        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, truncate=True, return_as_list=True)
         print(rawresponse)
         chats = rawresponse[0].split('\n')
         return self.getUnique(chats)
 
 @client.event
 async def on_ready():
-    print(client.user.name + ' is ready!')
+    bot_name = client.user.name
+    print(bot_name + ' is ready!')
 
 @client.event
 async def on_message(message):
@@ -101,6 +102,6 @@ async def on_message(message):
                 predictedResponse = convo.buildResponse()
                 removeActiveChannel(message.channel.id)
                 await message.channel.send(predictedResponse)
-        break
+            break
 
 client.run(open("client-token", "r").readline())
