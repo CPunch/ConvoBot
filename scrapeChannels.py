@@ -20,9 +20,9 @@ def deleteIfExist(file_path):
         os.remove(file_path)
 
 async def scrapeChannel(channel):
-
     # if we already have a log for that channel, remove it!
-    deleteIfExist(os.path.join(chat_dir, channel.name + str(channel.id)))
+    file_path = os.path.join(chat_dir, channel.name + str(channel.id))
+    deleteIfExist(file_path)
 
     try:
         with open(file_path, "a") as cLog:
@@ -36,7 +36,7 @@ async def scrapeChannel(channel):
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
                 cLog.write(str(msg.encode('utf-8')) + '\n')
-    except:
+    except e:
         print("failed!")
 
 @client.event
