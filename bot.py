@@ -18,6 +18,9 @@ gpt2.load_gpt2(sess)
 bot_name = "@ConvoBot"
 activeChannels = {}
 
+# zewia (for being a racist edgy POS), 
+blacklistedUsers = [655845650478530585]
+
 def checkActiveChannel(id):
     if id in activeChannels:
         return True
@@ -67,8 +70,8 @@ async def on_message(message):
     if len(message.clean_content) <= 0 or "http" in message.clean_content:
         return
 
-    # don't do anything if we sent the message
-    if message.author == client.user:
+    # don't do anything if we sent the message, and ignore it if it's from a blacklisted user
+    if message.author == client.user or message.author.id in blacklistedUsers:
         return
 
     mentions = message.mentions
@@ -86,7 +89,7 @@ async def on_message(message):
                 lastMessage = None
                 async for messg in message.channel.history(limit=4):
                     msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii').replace(bot_name, "")
-                    if bl.passFilter(msg): 
+                    if bl.passFilter(msg) and not message.author.id in blacklistedUsers: 
 
                         # combine messages from people onto the same line
                         if lastMessage != None and lastMessage.author.id == messg.author.id:
