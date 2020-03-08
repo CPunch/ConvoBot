@@ -76,7 +76,7 @@ async def on_message(message):
                 # build conversation, then use gpt-2 on convo to extract response
                 convo = Conversation()
                 lastMessage = None
-                async for messg in channel.history(limit=10):
+                async for messg in message.channel.history(limit=10):
                     msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii')
                     if bl.passFilter(msg): 
 
