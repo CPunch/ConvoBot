@@ -15,6 +15,6 @@ if not os.path.isdir(os.path.join("models", model_name)):
 sess = gpt2.start_tf_sess()
 
 # start train
-gpt2.finetune(sess, main_dataset, accumulate_gradients=1, use_memory_saving_gradients=True, model_name=model_name, steps=10000) # steps is max number of training steps
+gpt2.finetune(sess, main_dataset, accumulate_gradients=1, use_memory_saving_gradients=True, model_name=model_name, save_every=500, steps=1000) # steps is max number of training steps
 
 print(gpt2.generate(sess))
