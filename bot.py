@@ -11,8 +11,10 @@ import discord
 import blacklist as bl
 
 # loads our trained model
-sess = gpt2.start_tf_sess()
+sess = gpt2.start_tf_sess(threads=2)
 gpt2.load_gpt2(sess)
+
+responses=0
 
 # just some stuff to add to the magic
 bot_name = "@ConvoBot"
@@ -56,7 +58,12 @@ class Conversation:
         return results[-2]
 
     def buildResponse(self):
+        responses=responses+1
         rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
+
+        # clean memory every 10 responses. things can get fat really quickly if you don't :eyes:
+        if responses % 10:
+            sess = gpt2.reset_session(sess, threads=2)
         print(rawresponse)
         chats = rawresponse[0].split('\n')
         return self.getUnique(chats)
