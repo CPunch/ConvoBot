@@ -14,6 +14,8 @@ import blacklist as bl
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess)
 
+# just some stuff to add to the magic
+bot_name = "@ConvoBot"
 activeChannels = {}
 
 def checkActiveChannel(id):
@@ -46,7 +48,7 @@ class Conversation:
 
     def getUnique(self, results):
         for res in results:
-            if not res in self.conversation and bl.passFilter(res):
+            if not res in self.conversation and bl.passFilter(res) and not bot_name in res:
                 return res
         return results[-2]
 
@@ -82,7 +84,7 @@ async def on_message(message):
                 # build conversation, then use gpt-2 on convo to extract response
                 convo = Conversation()
                 lastMessage = None
-                async for messg in message.channel.history(limit=10):
+                async for messg in message.channel.history(limit=20):
                     msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii')
                     if bl.passFilter(msg): 
 
