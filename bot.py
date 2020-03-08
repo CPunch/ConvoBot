@@ -46,7 +46,7 @@ class Conversation:
 
     def getUnique(self, results):
         for res in results:
-            if not res in self.conversation:
+            if not res in self.conversation and bl.passFilter(res):
                 return res
         return results[-2]
 
