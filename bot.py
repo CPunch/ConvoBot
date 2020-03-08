@@ -85,7 +85,7 @@ async def on_message(message):
                 convo = Conversation()
                 lastMessage = None
                 async for messg in message.channel.history(limit=20):
-                    msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii')
+                    msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii').replace(bot_name, "")
                     if bl.passFilter(msg): 
 
                         # combine messages from people onto the same line
