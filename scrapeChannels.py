@@ -15,12 +15,14 @@ whitelist = [646807091012435981, 502289648551329793, 502296284556951563]
 def passFilter(msg):
     return len(msg) > 0
 
+def deleteIfExist(file_path):
+    if os.path.isfile(file_path):
+        os.remove(file_path)
+
 async def scrapeChannel(channel):
 
     # if we already have a log for that channel, remove it!
-    file_path = os.path.join(chat_dir, channel.name + str(channel.id))
-    if os.path.isfile(file_path):
-        os.remove(file_path)
+    deleteIfExist(os.path.join(chat_dir, channel.name + str(channel.id)))
 
     try:
         with open(file_path, "a") as cLog:
@@ -63,6 +65,7 @@ async def on_ready():
                     await scrapeChannel(channel)
     
     # after scraping, combine all data into one file for training
+    deleteIfExist(main_dataset)
     newfile = open(main_dataset, "a")
 
     for log in os.listdir(chat_dir):
