@@ -56,7 +56,7 @@ class Conversation:
         return results[-2]
 
     def buildResponse(self):
-        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, truncate=True, return_as_list=True)
+        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
         print(rawresponse)
         chats = rawresponse[0].split('\n')
         return self.getUnique(chats)
