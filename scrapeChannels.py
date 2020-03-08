@@ -33,7 +33,7 @@ async def scrapeChannel(channel):
 
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
-                cLog.write(str(msg.encode('utf-8')))
+                cLog.write(str(msg.encode('utf-8')) + '\n')
     except:
         print("failed!")
 

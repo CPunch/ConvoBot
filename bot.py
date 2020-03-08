@@ -33,10 +33,10 @@ class Conversation:
     def add(self, text):
         self.conversation.append(text.replace("\n", ""))
 
-    def grabText(self, nspace = 1):
+    def grabText(self):
         output = ""
         for reply in reversed(self.conversation):
-            output = output + (reply + ("\n" * nspace))
+            output = output + reply + "\n"
         return output
 
     def buildResponse(self):
