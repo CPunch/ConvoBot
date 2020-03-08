@@ -48,12 +48,13 @@ class Conversation:
         for res in results:
             if not res in self.conversation:
                 return res
+        return results[-2]
 
     def buildResponse(self):
         rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
         print(rawresponse)
         chats = rawresponse[0].split('\n')
-        return getUnique(chats)
+        return self.getUnique(chats)
 
 @client.event
 async def on_ready():
