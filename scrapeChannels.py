@@ -35,7 +35,7 @@ async def scrapeChannel(channel):
 
                     # combine messages from people onto the same line
                     if lastMessage != None and lastMessage.author.id == message.author.id:
-                        rawData[-1] = rawData[-1] + " " + msg
+                        rawData[-1] = rawData[-1] + ". " + msg
                     else:
                         rawData.append(msg)
                     lastMessage = message
@@ -43,7 +43,7 @@ async def scrapeChannel(channel):
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
                 cLog.write(msg + '\n')
-    except e:
+    except:
         print("failed!")
 
 @client.event

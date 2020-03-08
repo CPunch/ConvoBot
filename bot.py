@@ -36,7 +36,7 @@ class Conversation:
         self.conversation.append(text.replace("\n", ""))
 
     def continued(self, text):
-        self.conversation[-1] = self.conversation[-1] + " " + text
+        self.conversation[-1] = self.conversation[-1] + ". " + text
 
     def grabText(self):
         output = ""
