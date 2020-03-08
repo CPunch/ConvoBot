@@ -68,6 +68,7 @@ class Conversation:
         # clean memory every 10 responses. things can get fat really quickly if you don't :eyes:
         if responses % 10:
             sessCritical = True
+            print("=========FREEING MEMORY=========")
             sess = gpt2.reset_session(sess, threads=2)
             sessCritical = False
         print(rawresponse)
