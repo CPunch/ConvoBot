@@ -1,3 +1,4 @@
+import tensorflow as tf
 import gpt_2_simple as gpt2
 import os
 import requests
