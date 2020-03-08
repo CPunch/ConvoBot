@@ -16,6 +16,7 @@ gpt2.load_gpt2(sess)
 
 responses=0
 sessCritical=False
+workQueue=0 # keep track to make sure we don't free the model while it's being cleared
 
 # just some stuff to add to the magic
 bot_name = "@ConvoBot"
@@ -62,11 +63,15 @@ class Conversation:
         global responses
         global sess
         global sessCritical
+        global workQueue
         responses=responses+1
-        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
 
-        # clean memory every 10 responses. things can get fat really quickly if you don't :eyes:
-        if responses % 10 == 0:
+        workQueue=workQueue+1
+        rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
+        workQueue=workQueue-1
+
+        # if we've used the model 5 times and we're not currently using it, reset the model to free up memory!
+        if responses > 5 and workQueue <= 0:
             sessCritical = True
             print("=========FREEING MEMORY=========")
             sess = gpt2.reset_session(sess)
@@ -82,11 +87,11 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if len(message.clean_content) <= 0 or "http" in message.clean_content:
+    if not bl.passFilter(message.clean_content):
         return
 
     # don't do anything if we sent the message, and ignore it if it's from a blacklisted user, or if we're currently clearing tensorflow memory
-    if message.author == client.user or message.author.id in blacklistedUsers or sessCritical:
+    if message.author == client.user or (message.author.id in blacklistedUsers) or sessCritical:
         return
 
     mentions = message.mentions
