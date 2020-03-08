@@ -66,7 +66,7 @@ class Conversation:
         rawresponse = gpt2.generate(sess, prefix=self.grabText(), include_prefix=False, length=75, return_as_list=True)
 
         # clean memory every 10 responses. things can get fat really quickly if you don't :eyes:
-        if responses % 10:
+        if responses % 10 == 0:
             sessCritical = True
             print("=========FREEING MEMORY=========")
             sess = gpt2.reset_session(sess, threads=2)
