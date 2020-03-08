@@ -60,6 +60,7 @@ class Conversation:
         return results[-2]
 
     def buildResponse(self):
+        global sess
         global responses
         global sessCritical
         global workQueue
@@ -71,7 +72,6 @@ class Conversation:
 
         # if we've used the model 5 times and we're not currently using it, reset the model to free up memory!
         if responses > 5 and workQueue <= 0:
-            global sess
             sessCritical = True
             print("=========FREEING MEMORY=========")
             sess = gpt2.reset_session(sess)
