@@ -14,6 +14,9 @@ import blacklist as bl
 sess = gpt2.start_tf_sess()
 gpt2.load_gpt2(sess)
 
+# after 5 responses, it will reload the model, freeing memory.
+trigger_collect = 5
+
 responses=0
 sessCritical=False
 workQueue=0 # keep track to make sure we don't free the model while it's being cleared
@@ -71,10 +74,12 @@ class Conversation:
         workQueue=workQueue-1
 
         # if we've used the model 5 times and we're not currently using it, reset the model to free up memory!
-        if responses > 5 and workQueue <= 0:
+        if responses > trigger_collect and workQueue <= 0:
             sessCritical = True
             print("=========FREEING MEMORY=========")
             sess = gpt2.reset_session(sess)
+            gpt2.load_gpt2(sess)
+            responses = 0
             sessCritical = False
         print(rawresponse)
         chats = rawresponse[0].split('\n')
