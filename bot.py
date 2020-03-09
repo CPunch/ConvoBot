@@ -57,10 +57,23 @@ class Conversation:
         return output
 
     def getUnique(self, results):
+        # try to get the best
         for res in results:
             if not res in self.conversation and bl.passFilter(res) and not bot_name in res:
                 return res
-        return results[-2]
+
+        # that didn't work so go for second best
+        for res in results:
+            if bl.passFilter(res) and not bot_name in res:
+                return res
+
+        # we're getting very desparate
+        for res in results:
+            if bl.passFilter(res):
+                return res
+
+        # the results were poggers :(
+        return "err"
 
     def buildResponse(self):
         global sess
@@ -106,26 +119,32 @@ async def on_message(message):
             if (checkActiveChannel(message.channel.id)):
                 print("busy!")
                 return
-            # start "typing" to let the users know we're running the model
-            print("crafting response...")
-            async with message.channel.typing():
-                # build conversation, then use gpt-2 on convo to extract response
-                convo = Conversation()
-                lastMessage = None
-                async for messg in message.channel.history(limit=4):
-                    msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii').replace(bot_name, "")
-                    if bl.passFilter(msg) and not message.author.id in blacklistedUsers: 
 
-                        # combine messages from people onto the same line
-                        if lastMessage != None and lastMessage.author.id == messg.author.id:
-                            convo.continued(msg)
-                        else:
-                            convo.add(msg)
-                        lastMessage = messg
+            try:
+                # start "typing" to let the users know we're running the model
+                print("crafting response...")
+                async with message.channel.typing():
+                    # build conversation, then use gpt-2 on convo to extract response
+                    convo = Conversation()
+                    lastMessage = None
+                    async for messg in message.channel.history(limit=4):
+                        msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii').replace(bot_name, "")
+                        if bl.passFilter(msg) and not message.author.id in blacklistedUsers: 
 
-                predictedResponse = convo.buildResponse()
+                            # combine messages from people onto the same line
+                            if lastMessage != None and lastMessage.author.id == messg.author.id:
+                                convo.continued(msg)
+                            else:
+                                convo.add(msg)
+                            lastMessage = messg
+
+                    predictedResponse = convo.buildResponse()
+                    removeActiveChannel(message.channel.id)
+                    await message.channel.send(predictedResponse)
+            except:
+                # something happened, but thats okay, just reset
                 removeActiveChannel(message.channel.id)
-                await message.channel.send(predictedResponse)
+                
             break
 
 client.run(open("client-token", "r").readline())
