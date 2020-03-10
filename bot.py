@@ -105,7 +105,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if not bl.passFilter(message.clean_content):
+    if not bl.passFilter(bl.filterMessageToText(message)):
         return
 
     # don't do anything if we sent the message, and ignore it if it's from a blacklisted user, or if we're currently clearing tensorflow memory
@@ -128,7 +128,7 @@ async def on_message(message):
                     convo = Conversation()
                     lastMessage = None
                     async for messg in message.channel.history(limit=4):
-                        msg = messg.clean_content.encode('ascii', 'ignore').decode('ascii').replace(bot_name, "")
+                        msg = bl.filterMessageToText(messg)
                         if bl.passFilter(msg) and not message.author.id in blacklistedUsers: 
 
                             # combine messages from people onto the same line

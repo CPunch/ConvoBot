@@ -30,7 +30,7 @@ async def scrapeChannel(channel):
             # add channel histroy to raw data
             lastMessage = None
             async for message in channel.history(limit=10000): # should i limit more?? hmm
-                msg = message.clean_content.encode('ascii', 'ignore').decode('ascii')
+                msg = bl.filterMessageToText(message)
                 if bl.passFilter(msg): 
 
                     # combine messages from people onto the same line
@@ -43,7 +43,7 @@ async def scrapeChannel(channel):
             # raw data is reversed becasue discord api moment, so fix it and write to file
             for msg in reversed(rawData):
                 cLog.write(msg + '\n')
-    except:
+    except e:
         print("failed!")
 
 @client.event
