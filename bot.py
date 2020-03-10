@@ -22,7 +22,7 @@ sessCritical=False
 workQueue=0 # keep track to make sure we don't free the model while it's being cleared
 
 # just some stuff to add to the magic
-bot_name = "@ConvoBot"
+bot_name = "@ConvoBot "
 activeChannels = {}
 
 # zewia (for being a racist edgy POS), 
